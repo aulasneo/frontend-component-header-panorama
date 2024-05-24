@@ -68,7 +68,7 @@ const LearningHeader = ({
           <span className="d-block small m-0">{courseOrg} {courseNumber}</span>
           <span className="d-block m-0 font-weight-bold course-title">{courseTitle}</span>
         </div>
-        Panorama Link here<
+        Panorama Link here
         {linkPanorama && (
           <a className="px-4" href={`${getConfig().PANORAMA_URL}`}>Panorama</a>
         )}
