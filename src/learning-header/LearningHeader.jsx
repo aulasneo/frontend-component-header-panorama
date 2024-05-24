@@ -43,10 +43,12 @@ const LearningHeader = ({
   useEffect(() => {
     const fetchLink = async () => {
       const url = `${config.LMS_BASE_URL}/panorama/api/get-user-access`;
+      console.log(`Calling ${config.LMS_BASE_URL}/panorama/api/get-user-access`)
       try {
         const { data } = await getAuthenticatedHttpClient().get(url);
         const LinkData = camelCaseObject(data);
         const LinkResponse = data.body;
+        console.log(`Panorama user access: ${data}`)
         setLinkPanorama(LinkResponse);
 
       } catch (error) {
@@ -66,6 +68,7 @@ const LearningHeader = ({
           <span className="d-block small m-0">{courseOrg} {courseNumber}</span>
           <span className="d-block m-0 font-weight-bold course-title">{courseTitle}</span>
         </div>
+        Panorama Link here
         {linkPanorama && (
           <a className="px-4" href={`${getConfig().PANORAMA_URL}`}>Panorama</a>
         )}
