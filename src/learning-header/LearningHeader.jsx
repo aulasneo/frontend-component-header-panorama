@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { getConfig } from '@edx/frontend-platform';
+import { getConfig, camelCaseObject } from '@edx/frontend-platform';
+import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { AppContext } from '@edx/frontend-platform/react';
-
 import AnonymousUserMenu from './AnonymousUserMenu';
 import AuthenticatedUserDropdown from './AuthenticatedUserDropdown';
 import messages from './messages';
@@ -28,7 +28,8 @@ LinkedLogo.propTypes = {
 const LearningHeader = ({
   courseOrg, courseNumber, courseTitle, intl, showUserDropdown,
 }) => {
-  const { authenticatedUser } = useContext(AppContext);
+  const { authenticatedUser, config } = useContext(AppContext);
+  const [linkPanorama, setLinkPanorama] = useState();
 
   const headerLogo = (
     <LinkedLogo
@@ -39,6 +40,23 @@ const LearningHeader = ({
     />
   );
 
+  useEffect(() => {
+    const fetchLink = async () => {
+      const url = `${config.LMS_BASE_URL}/panorama/api/get-user-access`;
+      try {
+        const { data } = await getAuthenticatedHttpClient().get(url);
+        const LinkData = camelCaseObject(data);
+        const LinkResponse = data.body;
+        setLinkPanorama(LinkResponse);
+
+      } catch (error) {
+        const httpErrorStatus = error?.response?.status;
+        console.log(httpErrorStatus)
+      }
+    };
+    fetchLink();
+  }, [config.LMS_BASE_URL]);
+
   return (
     <header className="learning-header">
       <a className="sr-only sr-only-focusable" href="#main-content">{intl.formatMessage(messages.skipNavLink)}</a>
@@ -48,6 +66,9 @@ const LearningHeader = ({
           <span className="d-block small m-0">{courseOrg} {courseNumber}</span>
           <span className="d-block m-0 font-weight-bold course-title">{courseTitle}</span>
         </div>
+        {linkPanorama && (
+          <a className="px-4" href={`${getConfig().PANORAMA_URL}`}>Panorama</a>
+        )}
         {showUserDropdown && authenticatedUser && (
         <AuthenticatedUserDropdown
           username={authenticatedUser.username}
